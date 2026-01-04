@@ -1,123 +1,153 @@
-import pygame
-import sys
-import random
+# ---------------------
+# --- LIBRARIES ---
+# ---------------------
+import pygame  # Library for creating games and multimedia applications
+import sys     # Provides access to system-specific functions (like exiting)
+import random  # For generating random numbers (used for food positions)
 
-pygame.init()  # pygame Başlat
+# ---------------------
+# --- INITIALIZATION ---
+# ---------------------
+pygame.init()  # Initialize all imported Pygame modules
 
-# müzik ayarları
-pygame.mixer.init()  # mixer başlat
-pygame.mixer.music.load('snake.mp3')  # arka plan müziği yükle
-pygame.mixer.music.play(-1)  # müziği sonsuz döngüde çal
-pygame.mixer.music.set_volume(0.5)  # müzik ses seviyesi
+# ---------------------
+# --- MUSIC SETUP ---
+# ---------------------
+pygame.mixer.init()  # Initialize the mixer module for sound
+pygame.mixer.music.load('snake.mp3')  # Load background music file
+pygame.mixer.music.play(-1)  # Play music indefinitely (-1 loop)
+pygame.mixer.music.set_volume(0.5)  # Set music volume to 50%
 
-# ekran boyutu
-width, height = 600, 400  # boyutu
-screen = pygame.display.set_mode((width, height))  # ekran oluştur
-pygame.display.set_caption("🐍 Snake Game")  # pencere başlığı
+# ---------------------
+# --- SCREEN SETUP ---
+# ---------------------
+width, height = 600, 400  # Set screen width and height
+screen = pygame.display.set_mode((width, height))  # Create game window
+pygame.display.set_caption("🐍 Snake Game")  # Set window title
 
-# renk tanımlamaları
-GREEN = (170, 215, 81)  # açık yeşil
-DARK_GREEN = (0, 100, 0)  # koyu yeşil
-RED = (255, 0, 0)  # kırmızı
-WHITE = (255, 255, 255)  # beyaz
-BLACK = (0, 0, 0)  # siyah
-GRAY = (60, 60, 60)  # gri
+# ---------------------
+# --- COLORS ---
+# ---------------------
+GREEN = (170, 215, 81)  # Light green (background)
+DARK_GREEN = (0, 100, 0)  # Dark green (snake)
+RED = (255, 0, 0)  # Red (food)
+WHITE = (255, 255, 255)  # White (text)
+BLACK = (0, 0, 0)  # Black (not used currently)
+GRAY = (60, 60, 60)  # Gray (game over screen)
 
-# FPS
-clock = pygame.time.Clock()  # saat oluştur
-snake_speed = 10  # yılan hızı
+# ---------------------
+# --- FPS CONTROL ---
+# ---------------------
+clock = pygame.time.Clock()  # Create clock object to control frame rate
+snake_speed = 10  # Set initial snake speed (frames per second)
 
-# yılanın başlangıç konumu ve boyutu
-snake_pos = [100, 50]  # yılanın kafa pozisyonu
-snake_body = [[100, 50], [90, 50], [80, 50]]  # yılanın vücut parçaları
-snake_direction = 'RIGHT'  # yılanın ilk yönü
+# ---------------------
+# --- SNAKE INITIAL STATE ---
+# ---------------------
+snake_pos = [100, 50]  # Snake head initial position (x, y)
+snake_body = [[100, 50], [90, 50], [80, 50]]  # Initial snake body segments
+snake_direction = 'RIGHT'  # Initial movement direction
 
-# yem tanımlama
-food_pos = [random.randrange(1, (width//10)) * 10,
-            random.randrange(1, (height//10)) * 10]  # rastgele yem pozisyonu
-food_spawn = True  # yem mevcut mu
+# ---------------------
+# --- FOOD INITIAL STATE ---
+# ---------------------
+food_pos = [random.randrange(1, (width // 10)) * 10,
+            random.randrange(1, (height // 10)) * 10]  # Random food position
+food_spawn = True  # Boolean flag to track if food is present
 
-score = 0  # skor başlangıcı
+# ---------------------
+# --- SCORE ---
+# ---------------------
+score = 0  # Initial score
 
-font = pygame.font.SysFont('arial', 25)  # normal yazı tipi
-game_over_font = pygame.font.SysFont('arial', 40, True)  # kalın yazı tipi
+# ---------------------
+# --- FONTS ---
+# ---------------------
+font = pygame.font.SysFont('arial', 25)  # Font for score display
+game_over_font = pygame.font.SysFont(
+    'arial', 40, True)  # Bold font for game over
+
+# ---------------------
+# --- FUNCTIONS ---
+# ---------------------
 
 
 def show_score():
-    """Skoru ekrana yazdırma"""
-    score_text = font.render(f"Score: {score}", True, WHITE)
-    screen.blit(score_text, [10, 10])
+    """Display the current score on the screen"""
+    score_text = font.render(f"Score: {score}", True, WHITE)  # Render text
+    screen.blit(score_text, [10, 10])  # Draw text at top-left corner
 
 
 def draw_button(text, x, y, w, h, color, hover_color):
-    """Buton oluşturma fonksiyonu"""
-    mouse = pygame.mouse.get_pos()
-    click = pygame.mouse.get_pressed()
-    if x + w > mouse[0] > x and y + h > mouse[1] > y:
-        pygame.draw.rect(screen, hover_color, (x, y, w, h))
-        if click[0] == 1:
+    """Draw a clickable button and detect clicks"""
+    mouse = pygame.mouse.get_pos()  # Get mouse position
+    click = pygame.mouse.get_pressed()  # Get mouse button states
+    if x + w > mouse[0] > x and y + h > mouse[1] > y:  # Check if mouse is over button
+        pygame.draw.rect(screen, hover_color, (x, y, w, h))  # Draw hover color
+        if click[0] == 1:  # Left mouse button clicked
             return True
     else:
-        pygame.draw.rect(screen, color, (x, y, w, h))
-    text_surface = font.render(text, True, WHITE)
-    text_rect = text_surface.get_rect(center=(x + w / 2, y + h / 2))
-    screen.blit(text_surface, text_rect)
-    return False
+        pygame.draw.rect(screen, color, (x, y, w, h))  # Draw normal color
+    text_surface = font.render(text, True, WHITE)  # Render button text
+    text_rect = text_surface.get_rect(
+        center=(x + w / 2, y + h / 2))  # Center text
+    screen.blit(text_surface, text_rect)  # Draw text
+    return False  # Return False if button not clicked
 
 
 def game_over():
-    """Oyun bittiğinde ekrana mesaj ve yeniden başlatma seçeneği"""
-    pygame.mixer.music.stop()  # müzik durdur
-    while True:
-        screen.fill(GRAY)
+    """Game over screen with score and options to play again or exit"""
+    pygame.mixer.music.stop()  # Stop background music
+    while True:  # Loop until player exits or restarts
+        screen.fill(GRAY)  # Fill background with gray
         text = game_over_font.render(f"Game Over! Score: {score}", True, WHITE)
         text_rect = text.get_rect(center=(width / 2, height / 3))
-        screen.blit(text, text_rect)
+        screen.blit(text, text_rect)  # Draw game over text
 
-        # Yeniden oyna butonu
+        # Draw buttons
         again = draw_button("PLAY AGAIN", width / 2 - 100,
                             height / 2, 200, 50, DARK_GREEN, GREEN)
-        # Çıkış butonu
         exit_game = draw_button("EXIT", width / 2 - 100,
                                 height / 2 + 70, 200, 50, RED, (255, 100, 100))
 
+        # Event handling
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT:  # Window close button clicked
                 pygame.quit()
                 sys.exit()
 
-        if again:  # yeniden oyna seçildi
-            main_game()  # oyunu yeniden başlat
-        if exit_game:  # çıkış seçildi
+        if again:  # Restart game selected
+            main_game()  # Call main game function
+        if exit_game:  # Exit game selected
             pygame.quit()
             sys.exit()
 
-        pygame.display.update()
-        clock.tick(15)
+        pygame.display.update()  # Update screen
+        clock.tick(15)  # Limit frame rate for menu
 
 
 def main_game():
-    """Ana oyun döngüsü"""
+    """Main game loop"""
     global snake_pos, snake_body, snake_direction, food_pos, food_spawn, score
 
-    # oyun değişkenlerini sıfırla
+    # Reset game state
     snake_pos = [100, 50]
     snake_body = [[100, 50], [90, 50], [80, 50]]
     snake_direction = 'RIGHT'
-    food_pos = [random.randrange(1, (width//10)) * 10,
-                random.randrange(1, (height//10)) * 10]
+    food_pos = [random.randrange(1, (width // 10)) * 10,
+                random.randrange(1, (height // 10)) * 10]
     food_spawn = True
     score = 0
 
-    pygame.mixer.music.play(-1)  # müziği yeniden başlat
+    pygame.mixer.music.play(-1)  # Restart background music
 
-    while True:
+    while True:  # Main game loop
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT:  # Window close
                 pygame.quit()
                 sys.exit()
 
-            # yön kontrolü
+            # Direction control
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP and snake_direction != "DOWN":
                     snake_direction = 'UP'
@@ -128,7 +158,7 @@ def main_game():
                 elif event.key == pygame.K_RIGHT and snake_direction != "LEFT":
                     snake_direction = 'RIGHT'
 
-        # hareket
+        # Move snake head
         if snake_direction == 'UP':
             snake_pos[1] -= 10
         if snake_direction == 'DOWN':
@@ -138,49 +168,51 @@ def main_game():
         if snake_direction == 'RIGHT':
             snake_pos[0] += 10
 
-        # yeni kafa ekle
+        # Add new head to snake body
         snake_body.insert(0, list(snake_pos))
 
-        # yem yeme kontrolü
+        # Food collision
         if snake_pos[0] == food_pos[0] and snake_pos[1] == food_pos[1]:
-            score += 10  # skor artır
-            food_spawn = False  # yeni yem oluşturulacak
+            score += 10  # Increase score
+            food_spawn = False  # Spawn new food
         else:
-            snake_body.pop()  # son parçayı sil (hareket efekti)
+            snake_body.pop()  # Remove last segment to move snake
 
-        # yeni yem oluştur
+        # Spawn new food if eaten
         if not food_spawn:
             food_pos = [random.randrange(1, (width // 10)) * 10,
                         random.randrange(1, (height // 10)) * 10]
         food_spawn = True
 
-        # DUVARA ÇARPTI MI?
+        # Check collision with walls
         if snake_pos[0] < 0 or snake_pos[0] >= width or snake_pos[1] < 0 or snake_pos[1] >= height:
             game_over()
 
-        # KENDİNE ÇARPTI MI?
+        # Check collision with self
         for block in snake_body[1:]:
             if snake_pos[0] == block[0] and snake_pos[1] == block[1]:
                 game_over()
 
-        # arka plan
+        # Draw background
         screen.fill(GREEN)
 
-        # yılanı çiz
+        # Draw snake
         for block in snake_body:
             pygame.draw.rect(screen, DARK_GREEN, pygame.Rect(
                 block[0], block[1], 10, 10))
 
-        # yemi çiz
+        # Draw food
         pygame.draw.rect(screen, RED, pygame.Rect(
             food_pos[0], food_pos[1], 10, 10))
 
-        # skoru göster
+        # Show score
         show_score()
 
-        pygame.display.update()
-        clock.tick(snake_speed)
+        pygame.display.update()  # Update the screen
+        clock.tick(snake_speed)  # Control game speed
 
 
-# oyunu başlat
-main_game()
+# ---------------------
+# --- START GAME ---
+# ---------------------
+main_game()  # Start the main game loop
