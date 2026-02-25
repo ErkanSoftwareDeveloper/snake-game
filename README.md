@@ -1,11 +1,11 @@
-# 🐍 Snake Game
+#  Snake Game
 
 A classic **Snake game** desktop application with background music, built with **Python** and **Pygame**.
 The game features smooth controls, score tracking, and a fun, interactive interface.
 
 ---
 
-## ✨ Features
+##  Features
 
 * Classic Snake gameplay
 * Score tracking
@@ -16,7 +16,7 @@ The game features smooth controls, score tracking, and a fun, interactive interf
 
 ---
 
-## 🛠️ Technologies Used
+##  Technologies Used
 
 * **Python 3**
 * **Pygame** – game and multimedia library
@@ -24,7 +24,7 @@ The game features smooth controls, score tracking, and a fun, interactive interf
 
 ---
 
-## 📦 Installation
+##  Installation
 
 Clone the repository:
 
@@ -43,7 +43,7 @@ Make sure `snake.mp3` is in the same directory as `snake.py` for background musi
 
 ---
 
-## ▶️ Usage
+##  Usage
 
 Run the game:
 
@@ -60,7 +60,7 @@ python snake.py
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```text
 snake-game/
@@ -73,14 +73,14 @@ snake-game/
 
 ---
 
-## 📸 Video
+##  Video
 
 ![2026-01-1115-49-36-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/040b950d-d69a-4cc4-a20a-a1d6b24dac3f)
 
 
 ---
 
-## 🚀 Possible Improvements
+##  Possible Improvements
 
 * Add levels or increasing speed
 * High score tracking
@@ -90,6 +90,6 @@ snake-game/
 
 ---
 
-## 📄 License
+##  License
 
 This project is intended for **educational and personal use**.
